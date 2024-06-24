@@ -1,12 +1,29 @@
-const initialState = [];
+// const initialState = [];
 
-export default function cartReducer(state = initialState, action) {
+// export default function cartReducer(state = initialState, action) {
+//   switch (action.type) {
+//     case 'ADD_TO_CART':
+//       return [...state, action.payload];
+//     case 'REMOVE_FROM_CART':
+//       return state.filter(item => item.id !== action.payload);
+//     default:
+//       return state;
+//   }
+// }
+
+const initialState = {
+  cart: [],
+};
+
+const cartReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_TO_CART':
-      return [...state, action.payload];
+      return { ...state, cart: [...state.cart, action.payload] };
     case 'REMOVE_FROM_CART':
-      return state.filter(item => item.id !== action.payload);
+      return { ...state, cart: state.cart.filter(item => item.id !== action.payload) };
     default:
       return state;
   }
-}
+};
+
+export default cartReducer;
