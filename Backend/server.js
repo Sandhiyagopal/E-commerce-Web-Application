@@ -4,11 +4,12 @@ const connectDB = require('./db'); // Adjusted the path to db.js if it's one lev
 const User = require('./models/User'); // Adjusted the path to User model
 const Order = require('./models/Order'); // Adjusted the path to Order model
 const OrderItem = require('./models/OrderItem'); // Adjusted the path to OrderItem model
-// const Product = require('./models/Product'); // Adjusted the path to Product model
+const Product = require('./models/Product'); // Adjusted the path to Product model
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
 
 const app = express();
 
-// Connect to MongoDB
 connectDB();
 
 app.use(cors());
@@ -26,7 +27,6 @@ const products = [
 
 app.get('/api/products', (req, res) => {
   try {
-    // const products = Product.find();
     res.json(products);
   } catch (err) {
     console.error(err);
@@ -34,41 +34,48 @@ app.get('/api/products', (req, res) => {
   }
 });
 
-// Checkout
 app.post('/api/checkout', async (req, res) => {
   const { user, cart } = req.body;
-
   try {
-    const newUser = new User({
-      name: user.name,
-      email: user.email
+    const newUser = new User(user);
+    await newUser.save();
+
+    const orderItems = await Promise.all(
+      cart.map(async item => {
+        console.log("Itemmmmm",item)
+    //     const productId = new mongoose.Types.ObjectId(item.id); 
+    // const product = await Product.findById(productId);
+
+    //     if (!product) {
+    //       throw new Error(`Product not found for id: ${productId}`);
+    //     }
+
+        const orderItem = new OrderItem({
+          // product: product._id,
+          quantity: 1 
+        });
+
+        await orderItem.save();
+        return orderItem;
+      })
+    );
+
+    const totalAmount = cart.reduce((acc, item) => acc + item.price, 0);
+
+    const order = new Order({
+      amount: totalAmount,
+      user: newUser._id,
+      items: cart.map(item => item._id)
     });
+    await order.save();
 
-    const savedUser = await newUser.save();
-
-    const amount = cart.reduce((sum, item) => sum + item.price, 0);
-
-    const newOrder = new Order({
-      amount,
-      user: savedUser._id
-    });
-
-    const savedOrder = await newOrder.save();
-
-    for (const item of cart) {
-      const newOrderItem = new OrderItem({
-        order: savedOrder._id,
-        product: item._id
-      });
-      await newOrderItem.save();
-    }
-
-    res.status(200).send('Order placed successfully!');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    res.status(201).json({ message: 'Order placed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error placing order' });
   }
 });
+
 
 const PORT = process.env.PORT || 5000;
 
