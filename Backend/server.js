@@ -1,10 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./db'); // Adjusted the path to db.js if it's one level up
-const User = require('./models/User'); // Adjusted the path to User model
-const Order = require('./models/Order'); // Adjusted the path to Order model
-const OrderItem = require('./models/OrderItem'); // Adjusted the path to OrderItem model
-const Product = require('./models/Product'); // Adjusted the path to Product model
+const connectDB = require('./db'); 
+const User = require('./models/User'); 
+const Order = require('./models/Order'); 
+const OrderItem = require('./models/OrderItem'); 
+const Product = require('./models/Product'); 
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 

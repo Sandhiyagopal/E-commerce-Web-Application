@@ -11,7 +11,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Example Product Schema definition in models/Product.js
 const productSchema = new Schema({
   _id: Schema.Types.ObjectId,
   name: String,
